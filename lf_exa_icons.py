@@ -26,8 +26,10 @@ def get_exa_version() -> Optional[str]:
         raise OSError('exa was not found on the path')
 
 
-def fetch_source(version: str = get_exa_version()) -> bytes:
+def fetch_source(version: str) -> bytes:
     """Fetch the current exa source file from GitHub."""
+    if version is None:
+        version = get_exa_version()
     if version is None:
         return requests.get(
             'https://raw.githubusercontent.com/ogham/exa/master/src/output/icons.rs'
