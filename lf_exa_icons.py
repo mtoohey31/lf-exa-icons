@@ -6,6 +6,14 @@ from tree_sitter import Language, Parser, Node
 import requests
 
 
+Language.build_library(
+    'build/my-languages.so',
+    ['vendor/tree-sitter-rust']
+)
+
+RS_LANGUAGE = Language('build/my-languages.so', 'rust')
+
+
 def get_exa_version() -> Optional[str]:
     """Determine the currently installed exa version."""
     try:
@@ -18,9 +26,8 @@ def get_exa_version() -> Optional[str]:
         raise OSError('exa was not found on the path')
 
 
-def fetch_source() -> bytes:
+def fetch_source(version: str = get_exa_version()) -> bytes:
     """Fetch the current exa source file from GitHub."""
-    version = get_exa_version()
     if version is None:
         return requests.get(
             'https://raw.githubusercontent.com/ogham/exa/master/src/output/icons.rs'
@@ -85,8 +92,8 @@ def parse_source(source: bytes) -> Tuple[Dict[str, str], str, str]:
         tree.root_node) if match[1] == 'match_block']
 
     if len(extension_match_blocks) == 1 and len(directory_match_blocks) == 1:
-        return (*parse_match_block(extension_match_blocks[0]),
-                parse_match_block(directory_match_blocks[0])[1])
+        return (*parse_match_block(extension_match_blocks[0], source),
+                parse_match_block(directory_match_blocks[0], source)[1])
     elif len(extension_match_blocks) == 1:
         directory_char_literal_query = RS_LANGUAGE.query("""
 (if_expression
@@ -103,14 +110,14 @@ def parse_source(source: bytes) -> Tuple[Dict[str, str], str, str]:
         directory_char_literals = [match[0] for match in directory_char_literal_query.captures(
             tree.root_node) if match[1] == 'directory_icon']
         if len(directory_char_literals) == 1:
-            return (*parse_match_block(extension_match_blocks[0]),
+            return (*parse_match_block(extension_match_blocks[0], source),
                     parse_icon(get_node_string(directory_char_literals[0],
                                                source)))
 
     raise ValueError('Source file did not contain supported syntax')
 
 
-def parse_match_block(match_block: Node) -> Tuple[Dict[str, str], str]:
+def parse_match_block(match_block: Node, source: bytes) -> Tuple[Dict[str, str], str]:
     """Parse the provide match block node and return a tuple containing a
     mapping of values to icons, and the default icon."""
     match_and_char_query = RS_LANGUAGE.query("""
@@ -169,13 +176,6 @@ def format_icons(icons: Tuple[Dict[str, str], str, str]) -> str:
 
 
 if __name__ == '__main__':
-    Language.build_library(
-        'build/my-languages.so',
-        ['vendor/tree-sitter-rust']
-    )
-
-    RS_LANGUAGE = Language('build/my-languages.so', 'rust')
-
     source = fetch_source()
     icons = parse_source(source)
     print(format_icons(icons))
