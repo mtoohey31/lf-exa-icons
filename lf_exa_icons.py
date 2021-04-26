@@ -26,7 +26,7 @@ def get_exa_version() -> Optional[str]:
         raise OSError('exa was not found on the path')
 
 
-def fetch_source(version: str) -> bytes:
+def fetch_source(version: Optional[str] = None) -> bytes:
     """Fetch the current exa source file from GitHub."""
     if version is None:
         version = get_exa_version()
