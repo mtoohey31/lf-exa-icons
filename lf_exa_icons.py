@@ -143,7 +143,7 @@ def parse_match_block(match_block: Node, source: bytes) -> Tuple[Dict[str, str],
 
 def parse_icon(icon_str: str) -> str:
     """Return a string containing the icon, given its string literal
-    represntation in Rust code."""
+    representation in Rust code."""
     return chr(int(re.sub(r'((\'|")\\u{)|(}(\'|"))', '', icon_str), 16))
 
 
@@ -173,7 +173,7 @@ def format_icons(icons: Tuple[Dict[str, str], str, str]) -> str:
     special_declarations = '\n'.join(
         [f'{key}={special_declaration_map[key]}:\\' for key in special_declaration_map])
     icon_declarations = '\n'.join(
-        [f'*.{ext}={icons_dict[ext]}:\\' for ext in icons_dict])
+        [f'*.{ext}={icons_dict[ext]}:\\\n*.{ext.upper()}={icons_dict[ext]}:\\' for ext in icons_dict])
     return f'export LF_ICONS="\\\n{special_declarations}\n{icon_declarations}\n"'
 
 
