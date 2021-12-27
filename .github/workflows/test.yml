@@ -2,6 +2,8 @@ name: Test with pytest
 on:
   push:
     branches: ["**"]
+  schedule:
+    - cron: 0 10 * * 6 # every Saturday at 10 AM
   workflow_dispatch:
 jobs:
   test:
