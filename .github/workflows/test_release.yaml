@@ -1,4 +1,4 @@
-name: Test with pytest
+name: Test and release with pytest and gh
 on:
   push:
     branches: ["**"]
@@ -6,7 +6,7 @@ on:
     - cron: 0 10 * * 6 # every Saturday at 10 AM
   workflow_dispatch:
 jobs:
-  test:
+  test_release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -26,3 +26,8 @@ jobs:
       - name: Test with pytest
         run: |
           pytest
+      - name: Release with gh
+        run: ./scripts/release.sh
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ github.token }}
