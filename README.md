@@ -2,9 +2,27 @@
 
 A script to match `lf`'s icons to `exa`'s icons.
 
-This script first detects the version of `exa` that is installed, then pulls the corresponding `exa` source code and parses it using [`py-tree-sitter`](https://github.com/tree-sitter/py-tree-sitter/) to extract icons for every availble extension. It then prints a statement of the same form as that in the instructions found in the `lf`  wiki [here](https://github.com/gokcehan/lf/wiki/Icons) which declares the `LF_ICONS` variable with the proper formatting when sourced. This script may break since it relies on being able to parse the `exa` source code correctly, however it should be able to handle minor changes since it is implemented with `tree-sitter` instead of simple string parsing. Also, note that there may still be a few minor icon differences, mainly for folders or files with specific names, since `exa` uses some more advanced icon assignment logic that relies on more than just extensions, which `lf` does not support.
+This script first detects the version of `exa` that is installed, then pulls the corresponding `exa` source code and parses it using [`py-tree-sitter`](https://github.com/tree-sitter/py-tree-sitter/) to extract icons for every available extension. It then prints a statement of the same form as that in the instructions found in the `lf` wiki [here](https://github.com/gokcehan/lf/wiki/Icons) which declares the `LF_ICONS` variable with the proper formatting when sourced. This script may break since it relies on being able to parse the `exa` source code correctly, however it should be able to handle minor changes since it is implemented with `tree-sitter` instead of simple string parsing. Also, note that there may still be a few minor icon differences, mainly for folders or files with specific names, since `exa` uses some more advanced icon assignment logic that relies on more than just extensions, which `lf` does not support.
 
 ## Usage
+
+### Fetching Release
+
+Use the following for curl:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/mtoohey31/lf-exa-icons/main/scripts/install.sh | sh
+```
+
+Or the following to use wget:
+
+```bash
+wget -qO - https://raw.githubusercontent.com/mtoohey31/lf-exa-icons/main/scripts/install.sh | sh
+```
+
+Finally, follow the instructions under [Sourcing](#sourcing).
+
+### Building
 
 Clone the repository, `cd` into it, and fetch the necessary submodules:
 
@@ -33,7 +51,11 @@ Then run it for real:
 ./lf_exa_icons.py > ~/.config/lf/icons
 ```
 
-Lastly, add the following line to your shell's config file (e.g.: `~/.bashrc`, `~/.zshrc`, `~/.config/fish/config.fish`):
+Finally, follow the instructions under [Sourcing](#sourcing).
+
+### Sourcing
+
+Add the following line to your shell's config file (e.g.: `~/.bashrc`, `~/.zshrc`, `~/.config/fish/config.fish`):
 
 ```bash
 source ~/.config/lf/icons
