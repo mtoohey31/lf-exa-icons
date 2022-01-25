@@ -2,6 +2,7 @@
 import subprocess
 from typing import Optional, Tuple, Dict
 import re
+import os
 from tree_sitter import Language, Parser, Node
 import requests
 
@@ -170,11 +171,16 @@ def format_icons(icons: Tuple[Dict[str, str], str, str]) -> str:
                                'ow': folder, 'st': folder, 'di': folder,
                                'pi': file, 'so': file, 'bd': file, 'cd': file,
                                'su': file, 'sg': file, 'ex': file, 'fi': file}
-    special_declarations = '\n'.join(
-        [f'{key}={special_declaration_map[key]}:\\' for key in special_declaration_map])
-    icon_declarations = '\n'.join(
-        [f'*.{ext}={icons_dict[ext]}:\\\n*.{ext.upper()}={icons_dict[ext]}:\\' for ext in icons_dict])
-    return f'export LF_ICONS="\\\n{special_declarations}\n{icon_declarations}\n"'
+    if os.name == 'nt' or "LF_EXA_ICONS_WINDOWS" in os.environ:
+        declarations = ':'.join(
+            [f'{key}={special_declaration_map[key]}' for key in special_declaration_map] +
+            [f'*.{ext}={icons_dict[ext]}:*.{ext.upper()}={icons_dict[ext]}' for ext in icons_dict])
+        return f'set LF_ICONS="{declarations}"'
+    else:
+        declarations = ':\\\n'.join(
+            [f'{key}={special_declaration_map[key]}' for key in special_declaration_map] +
+            [f'*.{ext}={icons_dict[ext]}:\\\n*.{ext.upper()}={icons_dict[ext]}' for ext in icons_dict])
+        return f'export LF_ICONS="{declarations}"'
 
 
 if __name__ == '__main__':
