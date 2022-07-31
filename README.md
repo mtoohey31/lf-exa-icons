@@ -29,8 +29,7 @@ Clone the repository, `cd` into it, and fetch the necessary submodules:
 ```bash
 git clone https://github.com/mtoohey31/lf-exa-icons
 cd lf-exa-icons
-git submodule init
-git submodule update
+git submodule update --init
 ```
 
 Install the required python packages:
@@ -42,13 +41,13 @@ pip3 install -r requirements.txt
 Run the script once without writing it to ensure the output matches the expected format:
 
 ```bash
-./lf_exa_icons.py
+python3 lf_exa_icons/main.py
 ```
 
 Then run it for real:
 
 ```bash
-./lf_exa_icons.py > ~/.config/lf/icons
+python3 lf_exa_icons/main.py > ~/.config/lf/icons
 ```
 
 Finally, follow the instructions under [Sourcing](#sourcing).

@@ -1,21 +1,15 @@
-#!/usr/bin/env python3
 import subprocess
-from typing import Optional, Tuple, Dict
 import re
 import os
+import argparse as ap
 from tree_sitter import Language, Parser, Node
 import requests
 
 
-Language.build_library(
-    'build/my-languages.so',
-    ['vendor/tree-sitter-rust']
-)
-
-RS_LANGUAGE = Language('build/my-languages.so', 'rust')
+RS_LANGUAGE = Language('build/tree-sitter-rust.so', 'rust')
 
 
-def get_exa_version() -> Optional[str]:
+def get_exa_version() -> str | None:
     """Determine the currently installed exa version."""
     try:
         output = subprocess.check_output(['exa', '--version']).decode('utf8')
@@ -27,7 +21,7 @@ def get_exa_version() -> Optional[str]:
         raise OSError('exa was not found on the path')
 
 
-def fetch_source(version: Optional[str] = None) -> bytes:
+def fetch_source(version: str | None = None) -> bytes:
     """Fetch the current exa source file from GitHub."""
     if version is None:
         version = get_exa_version()
@@ -52,7 +46,7 @@ def fetch_source(version: Optional[str] = None) -> bytes:
             ).content
 
 
-def parse_source(source: bytes) -> Tuple[Dict[str, str], str, str]:
+def parse_source(source: bytes) -> tuple[dict[str, str], str, str]:
     """Parse the exa source code and return a tuple containing a mapping of
     extensions to icons, the default file icon, and the default directory icon."""
     parser = Parser()
@@ -120,7 +114,7 @@ def parse_source(source: bytes) -> Tuple[Dict[str, str], str, str]:
     raise ValueError('Source file did not contain supported syntax')
 
 
-def parse_match_block(match_block: Node, source: bytes) -> Tuple[Dict[str, str], str]:
+def parse_match_block(match_block: Node, source: bytes) -> tuple[dict[str, str], str]:
     """Parse the provide match block node and return a tuple containing a
     mapping of values to icons, and the default icon."""
     match_and_char_query = RS_LANGUAGE.query("""
@@ -163,7 +157,7 @@ def get_node_string(node: Node, source: bytes) -> str:
             lines[-1][:end_x]
 
 
-def format_icons(icons: Tuple[Dict[str, str], str, str]) -> str:
+def format_icons(icons: tuple[dict[str, str], str, str]) -> str:
     """Return icons in formatted string suitable for sourcing and use by `lf`."""
     icons_dict = icons[0]
     _, file, folder = icons
@@ -183,7 +177,20 @@ def format_icons(icons: Tuple[Dict[str, str], str, str]) -> str:
         return f'export LF_ICONS="{declarations}"'
 
 
-if __name__ == '__main__':
-    source = fetch_source()
+def main():
+    p = ap.ArgumentParser(prog="lf-exa-icons")
+    p.add_argument("source", nargs='?')
+    args = p.parse_args()
+    if args.source is None:
+        source = fetch_source()
+    else:
+        f = open(args.source, mode='rb')
+        source = f.read()
+        f.close()
+
     icons = parse_source(source)
     print(format_icons(icons))
+
+
+if __name__ == '__main__':
+    main()
