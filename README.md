@@ -38,6 +38,12 @@ Install the required python packages:
 pip3 install -r requirements.txt
 ```
 
+Build the tree-sitter Rust grammar library:
+
+```bash
+python3 scripts/build_library.py
+```
+
 Run the script once without writing it to ensure the output matches the expected format:
 
 ```bash
