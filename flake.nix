@@ -34,10 +34,7 @@
       nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [
         poetry
         python3
-        (python3Packages.python-lsp-server.overrideAttrs (_: {
-          # TODO: remove this once it works again
-          doInstallCheck = false;
-        }))
+        python3Packages.python-lsp-server
       ];
     });
   });
