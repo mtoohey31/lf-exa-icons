@@ -10,6 +10,13 @@
     overlays.default = final: _: rec {
       lf-exa-icons = (final.poetry2nix.mkPoetryApplication {
         projectDir = ./.;
+        overrides = final.poetry2nix.overrides.withDefaults (final: prev: {
+          tree-sitter = prev.tree-sitter.overridePythonAttrs (oldAttrs: {
+            propagatedBuildInputs = oldAttrs.propagatedBuildInputs ++ [
+              prev.setuptools
+            ];
+          });
+        });
       }).overrideAttrs (oldAttrs: {
         postFixup = oldAttrs.postFixup + ''
           substituteInPlace $out/lib/python3.10/site-packages/lf_exa_icons/main.py \
