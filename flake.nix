@@ -35,9 +35,7 @@
       inherit lf-exa-icons-output;
     };
 
-    devShells.default = (poetry2nix.mkPoetryEnv {
-      projectDir = ./.;
-    }).overrideAttrs (oldAttrs: {
+    devShells.default = lf-exa-icons.dependencyEnv.overrideAttrs (oldAttrs: {
       nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [
         poetry
         python3
