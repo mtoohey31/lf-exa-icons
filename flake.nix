@@ -8,21 +8,21 @@
 
   outputs = { self, nixpkgs, utils }: {
     overlays.default = final: _: rec {
-      lf-exa-icons = (final.poetry2nix.mkPoetryApplication {
-        projectDir = ./.;
-        overrides = final.poetry2nix.overrides.withDefaults (final: prev: {
-          tree-sitter = prev.tree-sitter.overridePythonAttrs (oldAttrs: {
-            propagatedBuildInputs = oldAttrs.propagatedBuildInputs ++ [
-              prev.setuptools
-            ];
-          });
-        });
-      }).overrideAttrs (oldAttrs: {
-        postFixup = oldAttrs.postFixup + ''
-          substituteInPlace $out/lib/python3.10/site-packages/lf_exa_icons/main.py \
+      lf-exa-icons = final.python3.pkgs.buildPythonApplication {
+        pname = "lf-exa-icons";
+        version = "0.1.0";
+        src = ./.;
+        patchPhase = ''
+          substituteInPlace lf_exa_icons/main.py \
             --replace 'build/tree-sitter-rust.so' '${final.tree-sitter-grammars.tree-sitter-rust}/parser'
         '';
-      });
+        # tests require network access
+        doCheck = false;
+        propagatedBuildInputs = with final.python3.pkgs; [
+          py-tree-sitter
+          requests
+        ];
+      };
 
       lf-exa-icons-output = final.runCommand "lf-exa-icons-output" { } ''
         ${lf-exa-icons}/bin/lf-exa-icons ${final.exa.src}/src/output/icons.rs > $out
@@ -35,13 +35,15 @@
       inherit lf-exa-icons lf-exa-icons-output;
     };
 
-    devShells.default = lf-exa-icons.dependencyEnv.overrideAttrs (oldAttrs: {
-      nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [
-        gcc
-        poetry
-        python3
-        python3Packages.python-lsp-server
+    devShells.default = mkShell {
+      packages = [
+        (python3.withPackages (ps: with ps; [
+          pytest
+          python-lsp-server
+          py-tree-sitter
+          requests
+        ]))
       ];
-    });
+    };
   });
 }
