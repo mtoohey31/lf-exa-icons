@@ -1,0 +1,30 @@
+name: CI
+on:
+  push:
+    branches: ["**"]
+  schedule:
+    - cron: 0 10 * * 6 # every Saturday at 10 AM
+  workflow_dispatch:
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Cache nix
+        uses: mtoohey31/cache-flake-attrs@v2
+        with:
+          key: ${{ runner.os }}-nix-${{ hashFiles('./flake.lock', './flake.nix') }}
+          flake_paths: .#devShells.x86_64-linux.default
+      - name: Build library, test, and release
+        run: |
+          nix --extra-experimental-features nix-command --extra-experimental-features flakes \
+            develop .# -c bash -c "scripts/build_library.py && python setup.py test && scripts/release.sh"
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Build with Nix
+        run: |
+          nix --extra-experimental-features nix-command --extra-experimental-features flakes \
+            build .# .#lf-exa-icons-output

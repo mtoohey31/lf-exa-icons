@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 existing_releases="$(gh release list | awk '{ print $1 }')"
 

@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 if command -v curl; then
   curl -sSL "https://github.com/mtoohey31/lf-exa-icons/releases/download/$(exa --version | awk 'NR==2 { print $1 }')/icons" > ~/.config/lf/icons
