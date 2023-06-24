@@ -24,9 +24,15 @@
         ];
       };
 
-      lf-exa-icons-output = final.runCommand "lf-exa-icons-output" { } ''
-        ${lf-exa-icons}/bin/lf-exa-icons ${final.exa.src}/src/output/icons.rs > $out
-      '';
+      lf-exa-icons-output =
+        let
+          exa-src = final.applyPatches {
+            inherit (final.exa) src patches;
+          };
+        in
+        final.runCommand "lf-exa-icons-output" { } ''
+          ${lf-exa-icons}/bin/lf-exa-icons ${exa-src}/src/output/icons.rs > $out
+        '';
     };
   } // utils.lib.eachDefaultSystem (system: with import nixpkgs
     { inherit system; overlays = [ self.overlays.default ]; } ; {

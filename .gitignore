@@ -1,5 +1,6 @@
-/build/
-/lf_exa_icons.egg-info/
 /result
+/.direnv
 
 **/__pycache__/
+/build/
+/lf_exa_icons.egg-info/
